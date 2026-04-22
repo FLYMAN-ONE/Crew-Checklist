@@ -1,10 +1,10 @@
 /* ════════════════════════════════════════════
    SCCM PREFLIGHT CHECKLIST — SERVICE WORKER
    Cache-first, offline-first strategy
-   Versione: 11.6
+   Versione: 11.8
 ════════════════════════════════════════════ */
 
-var CACHE_NAME = 'sccm-v11-6';
+var CACHE_NAME = 'sccm-v11-8';
 var FILES_TO_CACHE = [
   './',
   './scc_flight_checklist_v11_1.html'
