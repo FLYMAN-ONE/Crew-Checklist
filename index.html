@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-<title>SCCM PREFLIGHT CHECKLIST V11.6</title>
+<title>SCCM PREFLIGHT CHECKLIST V11.8</title>
 <!-- Font: sistema nativo — Inter è default su iOS/iPadOS 16+, nessuna CDN -->
 
 <!-- ══ PWA MANIFEST (inline data URI) ══ -->
@@ -512,6 +512,45 @@ html,body{margin:0;height:100%;overflow:hidden;
 .rp-iss-note{font-size:11px;color:var(--txt);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);line-height:1.5;word-break:break-word;}
 .rp-iss-none{font-size:10px;color:var(--dim);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);letter-spacing:1px;}
 .no-tasks{padding:18px;text-align:center;color:var(--dim);font-size:10px;letter-spacing:2px;}
+
+/* ═══════════════════════════
+   INSTALL PROMPT — bottom sheet
+═══════════════════════════ */
+#install-sheet{
+  position:fixed;bottom:0;left:0;right:0;z-index:9500;
+  background:var(--bg2);border-top:1px solid var(--border2);
+  border-radius:20px 20px 0 0;
+  padding:0 20px 34px;
+  box-shadow:0 -8px 40px rgba(0,0,0,.35);
+  transform:translateY(100%);
+  transition:transform .35s cubic-bezier(.32,.72,0,1);
+  max-width:540px;margin:0 auto;
+}
+#install-sheet.show{transform:translateY(0);}
+.ins-handle{width:36px;height:4px;background:var(--border2);border-radius:999px;
+  margin:12px auto 18px;}
+.ins-header{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+.ins-icon{width:52px;height:52px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--green));
+  display:flex;align-items:center;justify-content:center;font-size:26px;}
+.ins-title{font-size:15px;font-weight:800;letter-spacing:1px;color:var(--val);line-height:1.3;}
+.ins-sub  {font-size:11px;color:var(--lbl);margin-top:2px;letter-spacing:.3px;font-weight:500;}
+.ins-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.ins-step {display:flex;align-items:center;gap:12px;}
+.ins-step-num{width:22px;height:22px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;color:var(--accent);}
+.ins-step-txt{font-size:12px;color:var(--txt);font-weight:500;line-height:1.45;flex:1;}
+.ins-step-txt strong{color:var(--val);font-weight:700;}
+.ins-step-ico{font-size:16px;flex-shrink:0;}
+.ins-actions{display:flex;flex-direction:column;gap:10px;}
+#btn-install-native{width:100%;padding:15px;border:none;border-radius:13px;
+  font-size:13px;font-weight:800;letter-spacing:2px;font-family:inherit;
+  background:var(--accent);color:#fff;cursor:pointer;touch-action:manipulation;
+  box-shadow:0 0 20px rgba(56,189,248,.25);display:none;}
+#btn-install-dismiss{width:100%;padding:11px;border:none;border-radius:13px;
+  font-size:11px;font-weight:700;letter-spacing:1.5px;font-family:inherit;
+  background:var(--bg4);color:var(--lbl);cursor:pointer;touch-action:manipulation;}
 </style>
 </head>
 <body>
@@ -528,6 +567,23 @@ html,body{margin:0;height:100%;overflow:hidden;
 </div>
 <div id="inp-ov" class="ov">
   <div class="mbox">
+
+<!-- INSTALL PROMPT -->
+<div id="install-sheet" role="dialog" aria-modal="true" aria-label="Aggiungi alla Home">
+  <div class="ins-handle"></div>
+  <div class="ins-header">
+    <div class="ins-icon">✈</div>
+    <div>
+      <div class="ins-title">AGGIUNGI ALLA HOME SCREEN</div>
+      <div class="ins-sub">Accesso rapido · Funziona offline · Nessuna installazione</div>
+    </div>
+  </div>
+  <div class="ins-steps" id="ins-steps"></div>
+  <div class="ins-actions">
+    <button id="btn-install-native">⬇ INSTALLA APP</button>
+    <button id="btn-install-dismiss">NON ORA</button>
+  </div>
+</div>
     <div id="inp-title"></div>
     <textarea id="inp-ta"></textarea>
     <div id="inp-btns" class="mbtns" style="margin-top:14px">
@@ -541,7 +597,7 @@ html,body{margin:0;height:100%;overflow:hidden;
 <div id="screen-setup" class="screen">
   <button class="su-theme-btn" id="theme-btn-setup" title="CAMBIA TEMA"></button>
   <h1 class="su-title">SCCM PREFLIGHT CHECKLIST</h1>
-  <p class="su-ver">V 11.6</p>
+  <p class="su-ver">V 11.8</p>
   <div class="su-card">
     <div class="su-sect">DATI VOLO</div>
     <div class="su-grid">
@@ -630,7 +686,7 @@ html,body{margin:0;height:100%;overflow:hidden;
 /* ════════════════════
    CONSTANTS
 ════════════════════ */
-var KEY  = 'scc_v11_6';
+var KEY  = 'scc_v11_8';
 var RIEP = 'RIEPILOGO';
 var BR   = 'BRIEFING ROOM';
 
@@ -775,7 +831,7 @@ var DATA={
     {id:'787-PO-006',ph:'POST-FLIGHT',d:'Consegna CLB compilato al Comandante per firma.'},
     {id:'787-PO-007',ph:'POST-FLIGHT',d:'Chiudi e sincronizza ECB a terra il prima possibile.'},
     {id:'787-PO-008',ph:'POST-FLIGHT',d:'PANASONIC: Entertainment OFF all arrivo al parcheggio. Chiudi la tratta: icona close flight.'},
-    {id:'787-PO-009',ph:'POST-FLIGHT',d:'In base in Italia: lascia finestrini CLEAR al cambio crew.'}
+    {id:'787-PO-009',ph:'POST-FLIGHT',d:'Lascia finestrini clear al cambio crew (In posti molto caldi finestrini scuri).'}
   ]
 }};
 var BR_DEFS=[
@@ -1397,6 +1453,84 @@ if(state.setupComplete){
 } else {
   fillSetup();showScreen('screen-setup');
 }
+/* ════════════════════
+   INSTALL PROMPT
+════════════════════ */
+(function(){
+  var DISMISS_KEY='scc_install_dismissed';
+  var isStandalone=window.navigator.standalone===true||window.matchMedia('(display-mode:standalone)').matches;
+  if(isStandalone)return;
+  try{if(localStorage.getItem(DISMISS_KEY))return;}catch(e){}
+
+  var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+  var isSafari=/^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  var isAndroid=/Android/.test(navigator.userAgent);
+  var _deferredPrompt=null;
+
+  /* Android/Chrome: cattura evento nativo */
+  window.addEventListener('beforeinstallprompt',function(e){
+    e.preventDefault();
+    _deferredPrompt=e;
+    var btn=document.getElementById('btn-install-native');
+    if(btn)btn.style.display='block';
+  });
+
+  function buildSteps(){
+    var el=document.getElementById('ins-steps');
+    if(!el)return;
+    var steps=[];
+    if(isIOS&&isSafari){
+      steps=[
+        {n:'1',ico:'⬆',txt:'Tocca il pulsante <strong>Condividi</strong> nella barra di Safari'},
+        {n:'2',ico:'📲',txt:'Scorri e seleziona <strong>"Aggiungi alla schermata Home"</strong>'},
+        {n:'3',ico:'✅',txt:'Conferma toccando <strong>"Aggiungi"</strong> in alto a destra'}
+      ];
+    } else if(isIOS){
+      steps=[
+        {n:'1',ico:'🌐',txt:'Apri questa pagina in <strong>Safari</strong> (non Chrome o altri browser)'},
+        {n:'2',ico:'⬆',txt:'Tocca il pulsante <strong>Condividi</strong>'},
+        {n:'3',ico:'📲',txt:'Seleziona <strong>"Aggiungi alla schermata Home"</strong>'}
+      ];
+    } else if(isAndroid){
+      steps=[
+        {n:'1',ico:'⬇',txt:'Tocca il pulsante <strong>"Installa App"</strong> qui sotto'},
+        {n:'2',ico:'✅',txt:'Conferma l\'installazione nella finestra del browser'}
+      ];
+    } else {
+      steps=[
+        {n:'1',ico:'🌐',txt:'Apri questa pagina in <strong>Chrome</strong> o <strong>Safari</strong> su mobile'},
+        {n:'2',ico:'📲',txt:'Usa il menu del browser per <strong>"Aggiungi alla schermata Home"</strong>'}
+      ];
+    }
+    el.innerHTML=steps.map(function(s){
+      return'<div class="ins-step">'
+        +'<div class="ins-step-num">'+s.n+'</div>'
+        +'<span class="ins-step-ico">'+s.ico+'</span>'
+        +'<span class="ins-step-txt">'+s.txt+'</span>'
+        +'</div>';
+    }).join('');
+  }
+
+  function showSheet(){
+    buildSteps();
+    var sheet=document.getElementById('install-sheet');
+    if(sheet)requestAnimationFrame(function(){sheet.classList.add('show');});
+  }
+  function hideSheet(){
+    var sheet=document.getElementById('install-sheet');
+    if(sheet)sheet.classList.remove('show');
+    try{localStorage.setItem(DISMISS_KEY,'1');}catch(e){}
+  }
+
+  document.getElementById('btn-install-native').addEventListener('click',function(){
+    if(_deferredPrompt){_deferredPrompt.prompt();_deferredPrompt.userChoice.then(function(){hideSheet();_deferredPrompt=null;});}
+  });
+  document.getElementById('btn-install-dismiss').addEventListener('click',hideSheet);
+
+  /* Mostra dopo 3s */
+  setTimeout(showSheet, 3000);
+})();
+
 /* ════════════════════
    SERVICE WORKER REGISTRATION
 ════════════════════ */
